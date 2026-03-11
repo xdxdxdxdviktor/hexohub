@@ -1,46 +1,63 @@
-console.log("HexoHub web loaded");
-
-// --- Filtrace katalogu podle kategorie ---
-const filterButtons = document.querySelectorAll(".filters button");
-const catalogCards = document.querySelectorAll(".catalog-card");
-
-filterButtons.forEach(button => {
-    button.addEventListener("click", () => {
-        const category = button.getAttribute("data-category");
-
-        // aktivní tlačítko
-        filterButtons.forEach(btn => btn.classList.remove("active"));
-        button.classList.add("active");
-
-        catalogCards.forEach(card => {
-            if(category === "all" || card.getAttribute("data-category") === category){
-                card.style.display = "block";
-            } else {
-                card.style.display = "none";
-            }
-        });
-    });
+// Floating CTA
+window.addEventListener('scroll', () => {
+  document.getElementById('floatingCta').classList.toggle('show', window.scrollY > 300);
 });
 
-// --- Jednoduchý scroll efekt pro animaci sekcí ---
-const sections = document.querySelectorAll("section");
+// Mobile menu
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
 
-window.addEventListener("scroll", () => {
-    const scrollPos = window.scrollY + window.innerHeight * 0.8;
+// Scroll reveal
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      entry.target.style.transitionDelay = (i * 0.07) + 's';
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
 
-    sections.forEach(section => {
-        if(scrollPos > section.offsetTop){
-            section.style.opacity = 1;
-            section.style.transform = "translateY(0)";
-            section.style.transition = "all 0.8s ease-out";
-        } else {
-            section.style.opacity = 0;
-            section.style.transform = "translateY(50px)";
-        }
+document.querySelectorAll('.reveal, .why-feature').forEach(el => revealObserver.observe(el));
+
+// Process steps stagger
+const ps = document.querySelector('.process-steps');
+if (ps) {
+  new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting)
+        entry.target.querySelectorAll('.process-step').forEach((s, i) =>
+          setTimeout(() => s.classList.add('visible'), i * 130));
     });
-});
+  }, { threshold: 0.2 }).observe(ps);
+}
 
-// --- připravené pro budoucí funkce ---
-// - dynamické načítání featured serverů z API
-// - upvoty serverů
-// - notifikace nových partnerů
+// Gallery filter
+function filterGallery(btn, cat) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.gallery-item').forEach(item => {
+    const match = cat === 'all' || item.dataset.cat === cat;
+    item.style.opacity = match ? '1' : '0.18';
+    item.style.filter = match ? '' : 'grayscale(100%)';
+    item.style.transition = 'opacity 0.4s, filter 0.4s';
+  });
+}
+
+// Form submit
+function submitForm() {
+  const fname = document.getElementById('fname').value;
+  const phone = document.getElementById('phone').value;
+  if (!fname || !phone) { alert('Prosím vyplňte alespoň jméno a telefon.'); return; }
+  const notif = document.getElementById('notification');
+  notif.classList.add('show');
+  setTimeout(() => notif.classList.remove('show'), 4000);
+  ['fname','lname','phone','email','message'].forEach(id => document.getElementById(id).value = '');
+}
+
+// Hero parallax
+window.addEventListener('scroll', () => {
+  const bg = document.querySelector('.hero-bg');
+  if (bg && window.scrollY < window.innerHeight)
+    bg.style.transform = `translateY(${window.scrollY * 0.28}px)`;
+});
