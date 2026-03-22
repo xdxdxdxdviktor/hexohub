@@ -79,7 +79,6 @@
   .logo-img {
     width: 85px;
     height: 85px;
-    margin-left: -8rem;
     object-fit: contain;
     flex-shrink: 0;
     mix-blend-mode: multiply;
